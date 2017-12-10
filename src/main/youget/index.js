@@ -8,7 +8,7 @@ const iconv = require('iconv-lite');
 export const info = (url, success, error) => {
   execFile(`${settings.execute}`, ['-i', `${url}`], { encoding: settings.charset }, (err, stdout) => {
     if (err) {
-      error(err.message);
+      error(err);
       return;
     }
     success(handle.info(stdout));

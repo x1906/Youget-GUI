@@ -102,18 +102,23 @@ export default {
         // });
         sendInfo(this.form.url);
       } else {
-        Message({ type: 'warning', message: '请设置查询地址' });
+        Message({ type: 'warning', message: '请设置查询地址', showClose: true });
       }
       // console.log(`方法结束获取详情 ${this.dialog.loading}`);
     },
     sendInfoBack(data) {
-      this.info = data;
-      this.load = this.form.url;
-      if (data.list) {
-        this.form.format = data.list[0].format;
+      debugger;
+      if (data.status) {
+        this.info = data;
+        this.load = this.form.url;
+        if (data.list) {
+          this.form.format = data.list[0].format;
+        }
+        // console.log(`结束获取详情 ${this.dialog.loading}`);
+      } else {
+        Message({ type: 'error', message: data.message, showClose: true });
       }
       this.dialog.loading = false;
-      // console.log(`结束获取详情 ${this.dialog.loading}`);
     },
   },
 };
