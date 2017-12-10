@@ -1,26 +1,27 @@
 
-import { exec, spawn } from 'child_process';
-import { getExcuete } from '../utils/settings';
+import { spawn, execFile } from 'child_process';
+import settings from '../utils/settings';
+import * as handle from './utils';
 const iconv = require('iconv-lite');
-const excute = getExcuete();
+
 
 export const info = (url, success, error) => {
-  exec(`${excute} --json ${url}`, (err, stdout) => {
+  execFile(`${settings.execute}`, ['-i', `${url}`], { encoding: settings.charset }, (err, stdout) => {
     if (err) {
-      error(iconv.decode(new Buffer(err), 'UTF-8'));
+      error(err.message);
       return;
     }
-    success(iconv.decode(new Buffer(stdout), 'UTF-8'));
+    success(handle.info(stdout));
   });
 };
 
 export const download = (command, success, error) => {
   const youget = spawn('cmd.exe', ['/c', command]);
   youget.stdout.on('data', (data) => {
-    success(iconv.decode(new Buffer(data), 'UTF-8'));
+    success(iconv.decode(new Buffer(data), settings.charset));
   });
   youget.stderr.on('data', (data) => {
-    error(iconv.decode(new Buffer(data), 'UTF-8'));
+    error(iconv.decode(new Buffer(data), settings.charset));
   });
   youget.on('exit', (code, signal) => {
     console.log(`子进程退出码：${code} signal:${signal}`);

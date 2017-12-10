@@ -7,15 +7,16 @@ import * as youget from '../youget';
  */
 const processMaps = {};
 
-ipcMain.on(ipc.INFO, (event, message) => {
-  youget.info(message, (data) => {
-    event.send(ipc.INFO_REPLY, data);
+ipcMain.on(ipc.INFO, (event, url) => {
+  youget.info(url, (data) => {
+    event.sender.send(ipc.INFO_REPLY, data);
+    // event.returnValue = data;
   });
 });
 
 ipcMain.on(ipc.DOWNLOAD, (event, message) => {
   const download = youget.download(message, (data) => {
-    event.send(ipc.DOWNLOAD_REPLY, data);
+    event.sender.send(ipc.DOWNLOAD_REPLY, data);
   });
   processMaps[download.pid] = download;
 });

@@ -1,8 +1,7 @@
 
-export function getExcuete() {
-  return 'D:\\workspaces\\Youget-GUI\\static\\you-get.exe';
-}
+const settings = {
+  execute: 'you-get',
+  charset: 'UTF-8',
+};
 
-export function settings() {
-
-}
+export default settings;
