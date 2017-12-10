@@ -30,11 +30,11 @@
       <el-form>
         <el-form-item>
           <template slot="label" v-if="info.title">
-            来源: {{info.site}} &emsp;文件名称:{{ info.title }}
+            来源: {{info.site}} &emsp;文件名称: {{ info.title }}
           </template>
           <el-input v-model="form.url" @blur="sendInfo" placeholder="请输入下载视频网址">
             <template slot="append">
-              <el-button :loading="dialog.loading" title="显示详情" @click="sendInfo">
+              <el-button :loading="dialog.loading" title="显示详情" @click="sendInfo(true)">
                 <i v-if="!dialog.loading" class="iconfont icon-xiangqing"></i>
               </el-button>
             </template>
@@ -42,9 +42,9 @@
         </el-form-item>
         <el-form-item>
           <el-select :v-if="info.list" v-model="form.format" placeholder="请选择" style="width:100%;">
-            <el-option v-for="item in info.list" :key="item.format" :label="item.video_profile +' '+ item.format" :value="item.format">
-              <span style="float: left">{{ `${item.video_profile} (${item.format})` }}</span>
-              <span style="float: right; color: #8492a6; font-size: 13px">{{ item.size }}</span>
+            <el-option v-for="item in info.list" :key="item.format" :label="(item.videoProfile || '') +' '+ item.format" :value="item.format">
+              <span style="float: left">{{ `${item.videoProfile || ''} (${item.format}) ${ !item.quality ? '' : '(' + item.quality + ')' }` }}</span>
+              <span style="float: right; color: #8492a6; font-size: 13px">{{ item.size || '' }}</span>
             </el-option>
           </el-select>
         </el-form-item>
@@ -88,9 +88,9 @@ export default {
       this.info = {};
       this.dialog.visibale = true;
     },
-    sendInfo() {
+    sendInfo(enforce) {
       // 如果当前正在查询 不执行
-      if (this.dialog.loading || this.load === this.form.url) return;
+      if (this.dialog.loading || (this.load === this.form.url && !enforce)) return;
       if (this.form.url) {
         this.dialog.loading = true;
         // console.log(`开始获取详情 ${this.dialog.loading}`);
@@ -107,12 +107,11 @@ export default {
       // console.log(`方法结束获取详情 ${this.dialog.loading}`);
     },
     sendInfoBack(data) {
-      debugger;
       if (data.status) {
-        this.info = data;
+        this.info = data.data;
         this.load = this.form.url;
-        if (data.list) {
-          this.form.format = data.list[0].format;
+        if (data.data) {
+          this.form.format = data.data.list[0].format;
         }
         // console.log(`结束获取详情 ${this.dialog.loading}`);
       } else {

@@ -1,15 +1,19 @@
 
 import { spawn, execFile } from 'child_process';
 import settings from '../utils/settings';
-import * as handle from './utils';
+import * as handle from './handle';
 const iconv = require('iconv-lite');
 
 
 export const info = (url, success, error) => {
-  execFile(`${settings.execute}`, ['-i', `${url}`], { encoding: settings.charset }, (err, stdout) => {
+  // exec(`${settings.execute} '-i' ${url}`, { encoding: 'UTF-8' }, (err, stdout, stderr) => {
+  execFile(`${settings.execute}`, ['-i', `${url}`], { encoding: settings.charset }, (err, stdout, stderr) => {
     if (err) {
       error(err);
       return;
+    }
+    if (stderr) {
+      console.log(stderr);
     }
     success(handle.info(stdout));
   });
