@@ -3,6 +3,12 @@ import settings from '../utils/settings';
 import * as handle from './handle';
 // const iconv = require('iconv-lite');
 
+/**
+ * 查询视频详情信息
+ * @param {String} url 视频地址
+ * @param {Function} success 查询成功回调
+ * @param {Function} error 查询失败回调
+ */
 export const info = (url, success, error) => {
   // exec(`${settings.execute} '-i' ${url}`, { encoding: 'UTF-8' }, (err, stdout, stderr) => {
   execFile(settings.execute, ['-i', `${url}`], { encoding: settings.charset }, (err, stdout, stderr) => {
@@ -19,13 +25,13 @@ export const info = (url, success, error) => {
 
 /**
  * 下载文件
- * @param {* String} url 下载地址
- * @param {* Option} options 下载配置项
- * @returns 返回ChildProcess 类的实例
+ * @param {String} url 下载地址
+ * @param {*} options 下载配置项
+ * @returns 返回ChildProcess 类的实例(子进程对象)
  */
 export const download = (url, options) => {
   // 设置下载目录
-  const args = ['-o', options.dir];
+  const args = ['-o', options.dir, options.downloadWith || ''];
   // You may specify an HTTP proxy
   if (settings.proxy) {
     args.push('-x');

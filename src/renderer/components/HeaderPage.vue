@@ -1,44 +1,54 @@
 <template>
   <div class="app-header ">
     <ul class="f-left">
-      <li class="active" @click="newDownloads">
+      <li class="active" @click="newDownloads" title="新建下载">
         <i class="iconfont icon-jia"></i>
       </li>
-      <li>
-        <i class="iconfont icon-kaishi"></i>
+      <li title="开始下载" v-bind:class="{ active: header.start }" @click="startDownload">
+        <i class=" iconfont icon-kaishi"></i>
       </li>
-      <li>
+      <li title="暂停下载" v-bind:class="{ active: header.pause }" @click="pauseDownload">
         <i class="iconfont icon-zanting"></i>
       </li>
-      <li>
+      <li title="删除下载" v-bind:class="{ active: header.remove }" @click="removeDownload">
         <i class="iconfont icon-shanchu"></i>
       </li>
-      <li>
-        <i class="iconfont icon-yidong"></i>
-      </li>
+      <!-- <li>
+        <i class="iconfont icon-yidong "></i>
+      </li> -->
     </ul>
-    <ul class="f-right">
+    <ul class="f-right ">
       <li>
-        <i class="iconfont icon-menu"></i>
+        <i class="iconfont icon-menu "></i>
       </li>
-      <li>
-        <i class="iconfont icon-sousuo"></i>
-      </li>
+      <!-- <li>
+        <i class="iconfont icon-sousuo "></i>
+      </li> -->
     </ul>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
+import bus from './EventBus';
 export default {
   methods: {
     newDownloads() {
-      // 如果新建下载窗口未打开
-      if (!this.downloadDialog) this.$store.dispatch('toggleDownload', true);
+      // 打开单个下载窗口
+      bus.$emit('open-single-dialog');
     },
-    computed: {
-      ...mapGetters(['downloadDialog']),
+    startDownload() {
+      bus.$emit('start-download');
     },
+    pauseDownload() {
+      bus.$emit('pause-download');
+    },
+    removeDownload() {
+      bus.$emit('remove-download');
+    },
+  },
+  computed: {
+    ...mapGetters(['header']),
   },
 };
 </script>

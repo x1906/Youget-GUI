@@ -1,29 +1,32 @@
 const state = {
   height: 522,
-  // 下载窗口是否打开状态
-  downloadDialog: false,
+  header: {
+    start: false,
+    remove: false,
+    pause: false,
+  },
 };
 
 const mutations = {
   SET_MAIN_HEIGHT(state, height) {
     state.height = height;
   },
-  TOGGLE_DOWNLOAD(state, status) {
-    state.downloadDialog = status;
+  SET_HEADER_STATUS(state, header) {
+    state.header = header;
   },
 };
 
 const getters = {
   getHeight: state => state.height,
-  downloadDialog: state => state.downloadDialog,
+  header: state => state.header,
 };
 
 const actions = {
   resizeWindow({ commit }, height) {
     commit('SET_MAIN_HEIGHT', (height - 100));
   },
-  toggleDownload({ commit }, status) {
-    commit('TOGGLE_DOWNLOAD', status);
+  updateHeader({ commit }, header) {
+    commit('SET_HEADER_STATUS', header);
   },
 };
 

@@ -1,11 +1,17 @@
 
 const R = {
-  ok: (data, url, pid) => {
-    const result = { status: true, data, url, pid };
+  /**
+   * 正常返回
+   */
+  ok: (data, uid) => {
+    const result = { status: true, data, uid };
     return result;
   },
-  err: (message, url, pid) => {
-    const result = { status: false, message, url, pid };
+  /**
+  * 错误返回
+  */
+  err: (message, uid) => {
+    const result = { status: false, message, uid };
     return result;
   },
 };

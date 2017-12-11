@@ -1,7 +1,8 @@
 import settings from '../utils/settings';
+import * as status from '../../utils/status';
 
 const tags = [{
-  regx: /site:.*/g,
+  regx: /site:.*/,
   set: (data, str) => {
     data.site = str.replace(/\s*site:\s*/, '').trim();
   },
@@ -51,6 +52,10 @@ const startRegx = /Downloading.*\.\.\./;
 const startReplaceRegx = /Downloading\s+/;
 const downloadRegx = /├.*\]\s*/g;
 
+/**
+ * 显示详情解析
+ * @param {String} data 待解析数据
+ */
 export function info(data) {
   const result = {
     list: [],
@@ -63,7 +68,6 @@ export function info(data) {
       temp = tag.regx.exec(data);
     }
   });
-
 
   listTags.forEach((tag) => {
     let temp = tag.regx.exec(data);
@@ -80,6 +84,11 @@ export function info(data) {
   return result;
 }
 
+/**
+ * 下载进度/详情 解析
+ * @param {Buffer|String} data 待解析数据
+ * @param {String} dir 当前文件保存目录
+ */
 export function download(data, dir) {
   let ret;
   if (Buffer.isBuffer(data)) {
@@ -88,29 +97,33 @@ export function download(data, dir) {
     ret = data;
   }
   if (startRegx.test(ret)) {
+    const result = {};
+    const siteTag = tags[0];
+    if (siteTag.regx.test(ret)) {
+      // 处理site
+      const site = siteTag.regx.exec(ret)[0];
+      siteTag.set(result, site);
+    }
     // 开始下载
-    let name = startRegx.exec(ret)[0];
-    name = name.replace(startReplaceRegx, '').replace('...', '').trim();
-    const path = `${dir}/${name}`;
-    return {
-      name,
-      path,
-    };
+    const name = startRegx.exec(ret)[0];
+    result.name = name.replace(startReplaceRegx, '').replace('...', '').trim();
+    result.path = `${dir}/${result.name}`;
+    return result;
   } else if (downloadRegx.test(ret)) {
     // 下载中
     ret = ret.replace(downloadRegx, '').replace('(', '|').replace(')', '|').replace('%', '');
     const arr = ret.split('|');
     return {
-      status: 'Downloading',
+      status: status.DOING,
       progress: arr[0].trim(),
       size: arr[1].trim(),
       speed: arr[2].trim(),
     };
-  } else if (ret.indexOf('Merged') > -1) {
-    return {
-      status: 'Finish',
-      speed: '完成下载',
-    };
   }
+  // else if (ret.indexOf('Merged') > -1) {
+  //   return {
+  //     status: status.DONE,
+  //   };
+  // }
   return null;
 }

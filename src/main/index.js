@@ -1,4 +1,6 @@
+
 import { app, BrowserWindow } from 'electron' // eslint-disable-line
+import './initialize';
 // import 'es6-shim';
 /**
  * Set `__static` path to static files in production
@@ -23,6 +25,7 @@ function createWindow() {
     width: 800,
     minHeight: 300,
     minWidth: 500,
+    icon: `${__dirname}/app/icons/icon.ico`,
     // frame: false,
   });
   win.setMenu(null);
@@ -46,9 +49,6 @@ app.on('activate', () => {
     createWindow();
   }
 });
-
-require('./ipc');
-
 /**
  * Auto Updater
  *

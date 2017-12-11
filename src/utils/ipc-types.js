@@ -7,5 +7,5 @@ export const DOWNLOAD_REPLY = 'download-reply';
 export const PAUSE = 'pause';
 export const PAUSE_REPLY = 'pause-reply';
 
-export const DIR = 'directory';
-export const REPLY_DIR = 'directory-reply';
+export const REMOVE = 'remove';
+export const REMOVE_REPLY = 'remove-reply';
