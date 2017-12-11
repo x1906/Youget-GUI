@@ -55,7 +55,6 @@
   },
   "dependencies": {
     "element-ui": "^2.0.7",
-    "foreach": "^2.0.5",
     "iconv-lite": "^0.4.19",
     "lodash.foreach": "^4.5.0",
     "vue": "^2.3.3",

@@ -107,7 +107,6 @@ export function download(data, dir) {
       speed: arr[2].trim(),
     };
   } else if (ret.indexOf('Merged') > -1) {
-    console.log(ret);
     return {
       status: 'Finish',
       speed: '完成下载',
