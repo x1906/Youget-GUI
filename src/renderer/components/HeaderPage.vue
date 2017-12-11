@@ -1,7 +1,7 @@
 <template>
   <div class="app-header ">
     <ul class="f-left">
-      <li class="active" @click="dialog.visibale = true">
+      <li class="active" @click="newDownloads">
         <i class="iconfont icon-jia"></i>
       </li>
       <li>
@@ -25,99 +25,19 @@
         <i class="iconfont icon-sousuo"></i>
       </li>
     </ul>
-
-    <el-dialog title="新建下载" class="app-dialog" :visible.sync="dialog.visibale" :close-on-click-modal="dialog.modelClode" width="65%">
-      <el-form>
-        <el-form-item>
-          <template slot="label" v-if="info.title">
-            来源: {{info.site}} &emsp;文件名称: {{ info.title }}
-          </template>
-          <el-input v-model="form.url" @blur="sendInfo" placeholder="请输入下载视频网址">
-            <template slot="append">
-              <el-button :loading="dialog.loading" title="显示详情" @click="sendInfo(true)">
-                <i v-if="!dialog.loading" class="iconfont icon-xiangqing"></i>
-              </el-button>
-            </template>
-          </el-input>
-        </el-form-item>
-        <el-form-item>
-          <el-select :v-if="info.list" v-model="form.format" placeholder="请选择" style="width:100%;">
-            <el-option v-for="item in info.list" :key="item.format" :label="(item.videoProfile || '') +' '+ item.format" :value="item.format">
-              <span style="float: left">{{ `${item.videoProfile || ''} (${item.format}) ${ !item.quality ? '' : '(' + item.quality + ')' }` }}</span>
-              <span style="float: right; color: #8492a6; font-size: 13px">{{ item.size || '' }}</span>
-            </el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialog.visibale = false">取 消</el-button>
-        <el-button type="primary" @click="doDownload">确 定</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import { Message } from 'element-ui';
-import { sendInfo, initInfo } from '../ipc/ipcRenderer';
-
+import { mapGetters } from 'vuex';
 export default {
-  mounted() {
-    console.log('挂载 initInfo');
-    initInfo(this.sendInfoBack);
-  },
-  data() {
-    return {
-      form: {
-        url: 'http://v.youku.com/v_show/id_XMzIwMzkyMzYzMg==.html',
-        info: {},
-        format: '',
-      },
-      load: '',
-      info: {},
-      dialog: {
-        loading: false,
-        modelClode: false,
-        visibale: false,
-      },
-    };
-  },
   methods: {
-    doDownload() {
-      this.dialog.lodaing = false;
-      this.info = {};
-      this.dialog.visibale = true;
+    newDownloads() {
+      // 如果新建下载窗口未打开
+      if (!this.downloadDialog) this.$store.dispatch('toggleDownload', true);
     },
-    sendInfo(enforce) {
-      // 如果当前正在查询 不执行
-      if (this.dialog.loading || (this.load === this.form.url && !enforce)) return;
-      if (this.form.url) {
-        this.dialog.loading = true;
-        // console.log(`开始获取详情 ${this.dialog.loading}`);
-        // const $this = this;
-        // sendInfo(this.form.url).then((data) => {
-        //   $this.info = data;
-        //   $this.dialog.lodaing = false;
-        //   console.log(`结束获取详情 ${this.dialog.lodaing}`);
-        // });
-        sendInfo(this.form.url);
-      } else {
-        Message({ type: 'warning', message: '请设置查询地址', showClose: true });
-      }
-      // console.log(`方法结束获取详情 ${this.dialog.loading}`);
-    },
-    sendInfoBack(data) {
-      if (data.status) {
-        this.info = data.data;
-        this.load = this.form.url;
-        if (data.data) {
-          this.form.format = data.data.list[0].format;
-        }
-        // console.log(`结束获取详情 ${this.dialog.loading}`);
-      } else {
-        Message({ type: 'error', message: data.message, showClose: true });
-      }
-      this.dialog.loading = false;
+    computed: {
+      ...mapGetters(['downloadDialog']),
     },
   },
 };
@@ -133,6 +53,9 @@ export default {
   list-style: none;
   margin: 0;
   padding-left: 0;
+}
+.f-left {
+  float: left;
 }
 .f-left li {
   float: left;

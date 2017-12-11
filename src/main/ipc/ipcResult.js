@@ -1,11 +1,11 @@
 
 const R = {
-  ok: (data) => {
-    const result = { status: true, data };
+  ok: (data, url, pid) => {
+    const result = { status: true, data, url, pid };
     return result;
   },
-  err: (message) => {
-    const result = { status: false, message };
+  err: (message, url, pid) => {
+    const result = { status: false, message, url, pid };
     return result;
   },
 };

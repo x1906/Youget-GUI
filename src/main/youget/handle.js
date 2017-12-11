@@ -1,3 +1,5 @@
+import settings from '../utils/settings';
+
 const tags = [{
   regx: /site:.*/g,
   set: (data, str) => {
@@ -14,12 +16,14 @@ const listTags = [{
   regx: /- format:.*/g,
   set: (data, str) => {
     data.format = str.replace(/\s*- format:\s*/, '').trim();
+    data.downloadWith = `--format=${data.format}`;
   },
 }, {
   regx: /- itag:.*/g,
   set: (data, str) => {
     // alias /- format:.*/g
     data.format = str.replace(/\s*- itag:\s*/, '').trim();
+    data.downloadWith = `--itags=${data.format}`;
   },
 }, {
   regx: /quality:.*/g,
@@ -72,6 +76,22 @@ export function info(data) {
   return result;
 }
 
-export function download() {
-
+export function download(data) {
+  let ret = data;
+  if (Buffer.isBuffer(data)) {
+    ret = data.toString(settings.charset);
+  }
+  if (/(^(.|\n)*Downloading\s+)|( \.(.|\n)*)/.test(ret)) {
+    const name = ret.replace(/(^(.|\n)*Downloading\s+)|( \.(.|\n)*)/, '').trim();
+    console.log(name);
+    return {
+      name,
+    };
+  }
+  const arr = ret.replace(/├.*\]\s*/g, '').replace('(', '|').replace(')', '|').split('|');
+  return {
+    rate: arr[0],
+    progress: arr[1],
+    speed: arr[2],
+  };
 }
