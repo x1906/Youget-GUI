@@ -47,6 +47,10 @@ const listTags = [{
   },
 }];
 
+const startRegx = /Downloading.*\.\.\./;
+const startReplaceRegx = /Downloading\s+/;
+const downloadRegx = /├.*\]\s*/g;
+
 export function info(data) {
   const result = {
     list: [],
@@ -76,22 +80,38 @@ export function info(data) {
   return result;
 }
 
-export function download(data) {
-  let ret = data;
+export function download(data, dir) {
+  let ret;
   if (Buffer.isBuffer(data)) {
     ret = data.toString(settings.charset);
+  } else {
+    ret = data;
   }
-  if (/(^(.|\n)*Downloading\s+)|( \.(.|\n)*)/.test(ret)) {
-    const name = ret.replace(/(^(.|\n)*Downloading\s+)|( \.(.|\n)*)/, '').trim();
-    console.log(name);
+  if (startRegx.test(ret)) {
+    // 开始下载
+    let name = startRegx.exec(ret)[0];
+    name = name.replace(startReplaceRegx, '').replace('...', '').trim();
+    const path = `${dir}/${name}`;
     return {
       name,
+      path,
+    };
+  } else if (downloadRegx.test(ret)) {
+    // 下载中
+    ret = ret.replace(downloadRegx, '').replace('(', '|').replace(')', '|').replace('%', '');
+    const arr = ret.split('|');
+    return {
+      status: 'Downloading',
+      progress: arr[0].trim(),
+      size: arr[1].trim(),
+      speed: arr[2].trim(),
+    };
+  } else if (ret.indexOf('Merged') > -1) {
+    console.log(ret);
+    return {
+      status: 'Finish',
+      speed: '完成下载',
     };
   }
-  const arr = ret.replace(/├.*\]\s*/g, '').replace('(', '|').replace(')', '|').split('|');
-  return {
-    rate: arr[0],
-    progress: arr[1],
-    speed: arr[2],
-  };
+  return null;
 }

@@ -25,7 +25,7 @@ export const info = (url, success, error) => {
  */
 export const download = (url, options) => {
   // 设置下载目录
-  const args = ['-o', options.dir || settings.dir];
+  const args = ['-o', options.dir];
   // You may specify an HTTP proxy
   if (settings.proxy) {
     args.push('-x');

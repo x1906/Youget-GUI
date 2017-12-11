@@ -1,14 +1,18 @@
 <template>
   <div>
-    <el-table ref="multipleTable" :data="tableData" tooltip-effect="dark" style="width: 100%;" :height="getHeight">
-      <el-table-column type="selection"></el-table-column>
-      <el-table-column prop="name" label="名称" sortable>
+    <el-table ref="multipleTable" :data="tableData" tooltip-effect="dark" style="width: 100%;" :height="getHeight" row-key="url" :stripe="true" size="mini" :border="true">
+      <el-table-column type="selection" width="40"></el-table-column>
+      <el-table-column prop="name" label="文件名" min-width="150">
       </el-table-column>
-      <el-table-column prop="status" label="状态" sortable>
+      <el-table-column label="状态" min-width="150">
+        <template slot-scope="scope">
+          {{ scope.row.speed }}
+          <el-progress :percentage="parseFloat(scope.row.progress)"></el-progress>
+        </template>
       </el-table-column>
-      <el-table-column prop="speed" label="速度" sortable>
+      <el-table-column prop="size" label="大小" min-width="80">
       </el-table-column>
-      <el-table-column prop="size" label="大小" sortable>
+      <el-table-column prop="path" label="文件路径">
       </el-table-column>
     </el-table>
 
@@ -49,7 +53,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import { Message } from 'element-ui';
-import each from 'foreach';
+import forEach from 'lodash.foreach';
 import { sendInfo, initInfoBack, download, initDownloadBack } from '../ipc/ipcRenderer';
 export default {
   mounted() {
@@ -80,10 +84,6 @@ export default {
   methods: {
     closeDialog() { // 关闭新建下载窗口
       this.$store.dispatch('toggleDownload', false);
-      // const url = 'http://v.youku.com/v_show/id_XMzIwMzg4NTkyOA==.html';
-      // const index = this.tableJson[url];
-      // const ret = this.tableData[index];
-      // console.log(ret);
     },
     doDownload() {
       // 确认新建下载
@@ -93,23 +93,29 @@ export default {
       if (this.form.item.downloadWith) {
         options.downloadWith = this.form.item.downloadWith;
       }
-      this.tableData.push({
+      this.tableJson[this.form.url] = {
         url: this.form.url,
         downloadWith: options.downloadWith,
-      });
-      this.tableJson[this.form.url] = this.tableData.length - 1;
+      };
       download(this.form.url, options);
       this.clear();
     },
     downloadBack(data) {
       if (data.status) {
-        const index = this.tableJson[data.url];
-        const ret = this.tableData[index];
-        each(data.data, (value, key) => {
-          console.log(`key ${key} \t value ${value}`);
-          ret[key] = value;
-        });
-        // download();
+        const $this = this;
+        if (data.data.name) {
+          const newStart = this.tableJson[data.url];
+          newStart.index = this.tableData.length;
+          newStart.name = data.data.name;
+          newStart.speed = '等待下载...';
+          newStart.progress = '0';
+          this.tableData.push(newStart);
+        } else {
+          const ret = this.tableJson[data.url];
+          forEach(data.data, (value, key) => {
+            $this.$set(ret, key, value);
+          });
+        }
       }
     },
     sendInfo(enforce) {

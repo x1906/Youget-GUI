@@ -9,6 +9,7 @@ export default {
   name: 'youget-gui',
   mounted() {
     const $this = this;
+    this.$store.dispatch('resizeWindow', window.innerHeight);
     window.onresize = () => {
       $this.$store.dispatch('resizeWindow', window.innerHeight);
     };

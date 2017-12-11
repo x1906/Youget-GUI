@@ -1,4 +1,3 @@
-let s = 'z
 site:                优酷 (Youku)
 title:               虎啸龙吟 01
 stream:
@@ -14,4 +13,4 @@ audio-languages:
       download-url:  http://v.youku.com/v_show/id_XMzIwMzg4NTkyOA==
 
 Downloading 虎啸龙吟 01.mp4
-0.0% (  0.0/284.3MB) ├──────────────────────────────────────┤[ 1/15]'
+0.0% (  0.0/284.3MB) ├──────────────────────────────────────┤[ 1/15]
