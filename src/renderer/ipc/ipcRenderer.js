@@ -59,3 +59,19 @@ export function download(url, uid, options) {
 export function pause(uids) {
   ipcRenderer.send(ipc.PAUSE, uids);
 }
+
+/**
+ * 初始化时启动
+ */
+export function startup() {
+  const data = ipcRenderer.sendSync(ipc.STARTUP);
+  return data;
+}
+
+// /**
+//  * 保存
+//  * @param {Array} history 下载记录
+//  */
+// export function saveHistory(history) {
+//   ipcRenderer.sendSync(ipc.SAVE_HISTORY, history);
+// }

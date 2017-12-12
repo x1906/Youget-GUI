@@ -1,7 +1,7 @@
 /**
  * 开始
  */
-// export const START = 'Start';
+export const START = 'Start';
 /**
  * 暂停
  */

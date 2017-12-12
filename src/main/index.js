@@ -1,6 +1,7 @@
 
 import { app, BrowserWindow } from 'electron' // eslint-disable-line
-import './initialize';
+import './ipc';
+import * as sys from './sys';
 // import 'es6-shim';
 /**
  * Set `__static` path to static files in production
@@ -32,6 +33,7 @@ function createWindow() {
   win.loadURL(winURL);
 
   win.on('closed', () => {
+    console.log('win closed');
     win = null;
   });
 }
@@ -39,9 +41,17 @@ function createWindow() {
 app.on('ready', createWindow);
 
 app.on('window-all-closed', () => {
+  console.log('window-all-closed');
   if (process.platform !== 'darwin') {
+    console.log('app quit');
     app.quit();
   }
+});
+
+app.on('will-quit', () => {
+  // 当程序将要关闭
+  console.log('will-quit');
+  sys.exit();
 });
 
 app.on('activate', () => {

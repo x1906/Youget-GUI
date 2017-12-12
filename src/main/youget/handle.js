@@ -2,7 +2,7 @@ import settings from '../utils/settings';
 import * as status from '../../utils/status';
 
 const tags = [{
-  regx: /site:.*/,
+  regx: /site:.*/g,
   set: (data, str) => {
     data.site = str.replace(/\s*site:\s*/, '').trim();
   },
@@ -98,16 +98,15 @@ export function download(data, dir) {
   }
   if (startRegx.test(ret)) {
     const result = {};
-    const siteTag = tags[0];
-    if (siteTag.regx.test(ret)) {
+    if (/site:.*/.test(ret)) {
       // 处理site
-      const site = siteTag.regx.exec(ret)[0];
-      siteTag.set(result, site);
+      const site = /site:.*/.exec(ret)[0];
+      result.site = site.replace(/\s*site:\s*/, '');
     }
     // 开始下载
     const name = startRegx.exec(ret)[0];
     result.name = name.replace(startReplaceRegx, '').replace('...', '').trim();
-    result.path = `${dir}/${result.name}`;
+    result.path = `${dir}\\${result.name}`;
     return result;
   } else if (downloadRegx.test(ret)) {
     // 下载中
@@ -119,11 +118,10 @@ export function download(data, dir) {
       size: arr[1].trim(),
       speed: arr[2].trim(),
     };
+  } else if (ret.indexOf('Merged') > -1) {
+    return {
+      status: status.DONE,
+    };
   }
-  // else if (ret.indexOf('Merged') > -1) {
-  //   return {
-  //     status: status.DONE,
-  //   };
-  // }
   return null;
 }

@@ -48,7 +48,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="closeDialog()">取 消</el-button>
-        <el-button type="primary" @click="doDownload">确 定</el-button>
+        <el-button type="primary" @click="newDownload">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -59,15 +59,22 @@ import { mapGetters } from 'vuex';
 import uuid from 'node-uuid';
 import { Message } from 'element-ui';
 import forEach from 'lodash.foreach';
-import * as service from '../ipc/ipcRenderer';
+import * as remote from '../ipc/ipcRenderer';
 import bus from '../components/EventBus';
 import * as status from '../../utils/status';
 
 export default {
   mounted() {
     console.log('挂载 Donloads 页面 初始化');
-    // 启动监听新建单个下载
+
     const $this = this;
+    this.tableData = remote.startup();
+    if (this.tableData.length > 0) {
+      this.tableData.forEach((item) => {
+        $this.tableJson[item.uid] = item;
+      });
+    }
+    // 启动监听新建单个下载
     // 监听新建下载事件
     bus.$on('open-single-dialog', () => {
       $this.dialog.openSingle = true;
@@ -81,13 +88,14 @@ export default {
     });
 
     bus.$on('start-download', () => {
+      $this.startDownload();
     });
     // 初始化信息回调
-    service.initInfoBack(this.infoBack);
+    remote.initInfoBack(this.infoBack);
     // 初始化下载回调
-    service.initDownloadBack(this.downloadBack);
+    remote.initDownloadBack(this.downloadBack);
     // 初始化暂停下载回调
-    service.initPauseBack(this.pauseBack);
+    remote.initPauseBack(this.pauseBack);
   },
   data() {
     return {
@@ -111,12 +119,32 @@ export default {
     closeDialog() {
       this.dialog.openSingle = false;
     },
-    doDownload() {
+    newDownload() {
       // 确认新建下载
       this.closeDialog();
       this.dialog.lodaing = false;
-      this.newStart(this.form.url, this.form.downloadWith);
+      const uid = uuid.v1();
+      const url = this.form.url;
+      const downloadWith = this.form.downloadWith;
+      const newStart = {
+        uid,
+        url,
+        downloadWith,
+      };
+      this.tableJson[uid] = newStart;
+      this.newStart(newStart);
       this.clear();
+    },
+    startDownload() {
+      if (this.tableSelected.length > 0) {
+        const $this = this;
+        this.tableSelected.forEach((item) => {
+          if (item.status === status.PAUSE || item.status === status.ERROR) {
+            item.status = status.START;
+            $this.newStart(item);
+          }
+        });
+      }
     },
     pauseDownload() {
       const pause = [];
@@ -125,19 +153,10 @@ export default {
           pause.push(item.uid);
         }
       });
-      service.pause(pause);
+      remote.pause(pause);
     },
-    newStart(url, downloadWith) {
-      const uid = uuid.v1();
-      const newStart = {
-        uid,
-        url,
-        downloadWith,
-      };
-      service.download(this.form.url, uid, { downloadWith });
-      this.tableJson[uid] = newStart;
-      console.log(uid);
-      console.log(this.tableJson[uid]);
+    newStart(item) {
+      remote.download(item.url, item.uid, { ownloadWith: item.ownloadWith });
     },
     pauseBack(data) {
       if (data.status && this.tableJson[data.uid]) {
@@ -149,8 +168,8 @@ export default {
       if (data.status) {
         const $this = this;
         const ret = this.tableJson[data.uid];
-        // 只有开始下载 才有返回path
-        if (data.data.name) {
+        // 只有开始下载 才有返回path !ret.name 重新下载之前就有name
+        if (data.data.name && !ret.name) {
           this.tableData.push(ret);
         }
         forEach(data.data, (value, key) => {
@@ -163,7 +182,7 @@ export default {
       if (this.dialog.loading) return;
       if (this.form.url) {
         this.dialog.loading = true;
-        service.sendInfo(this.form.url);
+        remote.sendInfo(this.form.url);
       } else {
         Message({ type: 'warning', message: '请设置查询地址', showClose: true });
         this.clear();
@@ -189,26 +208,12 @@ export default {
     },
     handleSelectionChange(selection) {
       this.tableSelected = selection;
+      const falg = selection.length > 0;
       const header = {
-        start: false,
-        pause: false,
-        remove: false,
+        start: falg,
+        pause: falg,
+        remove: falg,
       };
-      selection.forEach((item) => {
-        // 下载中的才能暂停
-        if (item.status === status.DOING) {
-          header.pause = true;
-        }
-        // 下载完成 暂停 错误的才能删除
-        if (item.status === status.DONE || item.status === status.PAUSE
-          || item.status === status.ERROR) {
-          header.remove = true;
-        }
-        // 暂停 错误的才能开始下载
-        if (item.status === status.PAUSE || item.status === status.ERROR) {
-          header.start = true;
-        }
-      });
       this.$store.dispatch('updateHeader', header);
     },
   },
