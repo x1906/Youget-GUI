@@ -2,6 +2,9 @@
 
 > Youget for Electron + Vue
 
+
+![screen001](https://github.com/leopoo/Youget-GUI/blob/master/screen001.png?raw=true)
+
 #### Build Setup
 
 ``` bash
