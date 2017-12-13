@@ -115,10 +115,10 @@ export default class Download {
    * 创建一个异步进程
    * @param {String} uid 唯一ID
    * @param {Array} args 字符串参数列表
-   * @param {*} options # http://nodejs.cn/api/child_process.html#child_process_child_process_spawn_command_args_options
    * @param {Function} success 成功回调
    * @param {Function} error 失败回调
    * @param {Function} exit 退出回调
+   * @param {*} options # http://nodejs.cn/api/child_process.html#child_process_child_process_spawn_command_args_options
    */
   createSpawn(uid, args, success, error, exit, options) {
     if (!options) options = {};
