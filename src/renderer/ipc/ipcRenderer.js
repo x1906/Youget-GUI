@@ -45,11 +45,11 @@ export function sendInfo(url) {
 /**
  * 新建下载
  * @param {String} url 下载地址
- * @param {String} uid 下载项目的uuid
  * @param {*} options 下载配置项
+ * @param {*} record 下载记录
  */
-export function download(url, uid, options) {
-  ipcRenderer.send(ipc.DOWNLOAD, url, uid, options);
+export function download(url, options, record) {
+  return ipcRenderer.sendSync(ipc.SYNC_DOWNLOAD, url, options, record);
 }
 
 /**
@@ -64,7 +64,7 @@ export function pause(uids) {
  * 初始化时启动
  */
 export function startup() {
-  const data = ipcRenderer.sendSync(ipc.STARTUP);
+  const data = ipcRenderer.sendSync(ipc.SYNC_STARTUP);
   return data;
 }
 

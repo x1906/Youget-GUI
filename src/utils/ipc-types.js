@@ -13,5 +13,9 @@ export const REMOVE_REPLY = 'remove-reply';
 /**
  * 页面初始化 获取本地之前下载的文件
  */
-export const STARTUP = 'startup';
+export const SYNC_STARTUP = 'sync-startup';
 
+/**
+ * 下载监听
+ */
+export const SYNC_DOWNLOAD = 'sync-download';

@@ -23,7 +23,7 @@
     </el-table>
 
     <!-- 新建下载弹出层 -->
-    <el-dialog title="新建下载" class="app-dialog" :visible.sync="dialog.openSingle" :close-on-click-modal="true" width="65%" :before-close="closeDialog">
+    <el-dialog title="新建下载" class="app-dialog" :visible.sync="dialog.openSingle" :close-on-click-modal="false" width="65%" :before-close="closeDialog">
       <el-form>
         <el-form-item>
           <el-input v-model="form.url" placeholder="请输入下载视频网址">
@@ -56,7 +56,6 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import uuid from 'node-uuid';
 import { Message } from 'element-ui';
 import forEach from 'lodash.foreach';
 import * as remote from '../ipc/ipcRenderer';
@@ -123,25 +122,24 @@ export default {
       // 确认新建下载
       this.closeDialog();
       this.dialog.lodaing = false;
-      const uid = uuid.v1();
-      const url = this.form.url;
-      const downloadWith = this.form.downloadWith;
       const newStart = {
-        uid,
-        url,
-        downloadWith,
+        name: '名字被吃了.',
+        url: this.form.url,
+        downloadWith: this.form.downloadWith,
+        status: status.START,
       };
+      const uid = remote.download(newStart.url, {}, newStart);
+      newStart.uid = uid;
       this.tableJson[uid] = newStart;
-      this.newStart(newStart);
+      this.tableData.push(newStart);
       this.clear();
     },
     startDownload() {
       if (this.tableSelected.length > 0) {
-        const $this = this;
         this.tableSelected.forEach((item) => {
           if (item.status === status.PAUSE || item.status === status.ERROR) {
             item.status = status.START;
-            $this.newStart(item);
+            remote.download(item.url, {}, item);
           }
         });
       }
@@ -155,9 +153,6 @@ export default {
       });
       remote.pause(pause);
     },
-    newStart(item) {
-      remote.download(item.url, item.uid, { ownloadWith: item.ownloadWith });
-    },
     pauseBack(data) {
       if (data.status && this.tableJson[data.uid]) {
         const ret = this.tableJson[data.uid];
@@ -169,12 +164,11 @@ export default {
         const $this = this;
         const ret = this.tableJson[data.uid];
         // 只有开始下载 才有返回path !ret.name 重新下载之前就有name
-        if (data.data.name && !ret.name) {
-          this.tableData.push(ret);
+        if (ret) {
+          forEach(data.data, (value, key) => {
+            $this.$set(ret, key, value);
+          });
         }
-        forEach(data.data, (value, key) => {
-          $this.$set(ret, key, value);
-        });
       }
     },
     sendInfo() {

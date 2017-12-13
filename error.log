@@ -1,0 +1,9 @@
+you-get: [error] oops, something went wrong.
+you-get: don't panic, c'est la vie. please try the following steps:
+you-get:   (1) Rule out any network problem.
+you-get:   (2) Make sure you-get is up-to-date.
+you-get:   (3) Check if the issue is already known, on
+you-get:         https://github.com/soimort/you-get/wiki/Known-Bugs
+you-get:         https://github.com/soimort/you-get/issues
+you-get:   (4) Run the command with '--debug' option,
+you-get:       and report this issue with the full output.

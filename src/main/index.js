@@ -1,7 +1,6 @@
 
 import { app, BrowserWindow } from 'electron' // eslint-disable-line
-import './ipc';
-import * as sys from './sys';
+import YougetGUI from './sys/YougetGUI';
 // import 'es6-shim';
 /**
  * Set `__static` path to static files in production
@@ -12,6 +11,7 @@ if (process.env.NODE_ENV !== 'development') {
 }
 
 let win;
+let sys;
 const winURL = process.env.NODE_ENV === 'development'
   ? 'http://localhost:9080'
   : `file://${__dirname}/index.html`;
@@ -36,21 +36,21 @@ function createWindow() {
     console.log('win closed');
     win = null;
   });
+  /**
+   * 启动后端程序
+   */
+  sys = new YougetGUI();
 }
 
 app.on('ready', createWindow);
 
 app.on('window-all-closed', () => {
-  console.log('window-all-closed');
   if (process.platform !== 'darwin') {
-    console.log('app quit');
     app.quit();
   }
 });
 
 app.on('will-quit', () => {
-  // 当程序将要关闭
-  console.log('will-quit');
   sys.exit();
 });
 
