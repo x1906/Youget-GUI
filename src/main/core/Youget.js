@@ -210,6 +210,10 @@ export default class Youget extends Download {
       return {
         status: status.DONE,
       };
+    } else if (/Skipping .*: file already exists/.test(data)) { // 文件已存在
+      return {
+        status: status.DONE,
+      };
     }
     return null;
   }

@@ -11,3 +11,4 @@ thumbs.db
 package-lock.json
 download.json
 app.conf
+error.log

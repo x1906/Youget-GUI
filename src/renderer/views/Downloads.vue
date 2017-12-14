@@ -163,11 +163,18 @@ export default {
       if (data.status) {
         const $this = this;
         const ret = this.tableJson[data.uid];
-        // 只有开始下载 才有返回path !ret.name 重新下载之前就有name
         if (ret) {
-          forEach(data.data, (value, key) => {
-            $this.$set(ret, key, value);
-          });
+          if (data.data.status === status.DONE && ret.progress !== '100') {
+            ret.status = status.DONE;
+            ret.progress = '100';
+            const sizearr = ret.size.split('/');
+            const size = /[1-9]\d*\.\d*|0\.\d*[1-9]\d*/.exec(sizearr[1])[0];
+            ret.size = `${size}/${sizearr[1]}`;
+          } else {
+            forEach(data.data, (value, key) => {
+              $this.$set(ret, key, value);
+            });
+          }
         }
       }
     },

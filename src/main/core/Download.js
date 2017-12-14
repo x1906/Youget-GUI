@@ -47,6 +47,13 @@ export default class Download {
    */
   update(data, uid) {
     const ret = this.json[uid];
+    if (data.status === status.DONE && ret.progress !== '100') {
+      ret.status = status.DONE;
+      ret.progress = '100';
+      const sizearr = ret.size.split('/');
+      const size = /[1-9]\d*\.\d*|0\.\d*[1-9]\d*/.exec(sizearr[1])[0];
+      ret.size = `${size}/${sizearr[1]}`;
+    }
     forEach(data, (value, key) => {
       ret[key] = value;
     });

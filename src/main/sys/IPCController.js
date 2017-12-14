@@ -24,7 +24,6 @@ export default class IPCController {
     });
 
     ipcMain.on(ipc.SYNC_STARTUP, (event) => {
-      console.log('获取下载记录……');
       event.returnValue = download.getRecords();
     });
     /**
