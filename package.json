@@ -1,8 +1,8 @@
 {
   "name": "youget-gui",
   "version": "0.0.1",
-  "author": "",
-  "description": "Youget for Electron + Vue",
+  "author": "leopoo",
+  "description": "desktop based on \"you-get\" and \"youtube-dl\" download tools, powered by electron",
   "license": "MIT",
   "main": "./dist/electron/main.js",
   "scripts": {
