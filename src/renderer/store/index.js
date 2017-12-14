@@ -7,9 +7,5 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   modules,
-  // getters: {
-  //   height: state => state.Layout.height,
-  // },
   strict: process.env.NODE_ENV !== 'production',
-
 });

@@ -1,7 +1,5 @@
-
 import { app, BrowserWindow } from 'electron' // eslint-disable-line
 import YougetGUI from './sys/YougetGUI';
-// import 'es6-shim';
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
@@ -26,14 +24,11 @@ function createWindow() {
     width: 800,
     minHeight: 300,
     minWidth: 500,
-    icon: `${__dirname}/app/icons/icon.ico`,
-    // frame: false,
   });
   win.setMenu(null);
   win.loadURL(winURL);
 
   win.on('closed', () => {
-    console.log('win closed');
     win = null;
   });
   /**
@@ -59,22 +54,3 @@ app.on('activate', () => {
     createWindow();
   }
 });
-/**
- * Auto Updater
- *
- * Uncomment the following code below and install `electron-updater` to
- * support auto updating. Code Signing with a valid certificate is required.
- * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-electron-builder.html#auto-updating
- */
-
-/*
-import { autoUpdater } from 'electron-updater'
-
-autoUpdater.on('update-downloaded', () => {
-  autoUpdater.quitAndInstall()
-})
-
-app.on('ready', () => {
-  if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()
-})
- */

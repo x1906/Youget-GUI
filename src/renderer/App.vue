@@ -6,7 +6,7 @@
 
 <script>
 export default {
-  name: 'youget-gui',
+  name: 'YougetGUI',
   mounted() {
     const $this = this;
     this.$store.dispatch('resizeWindow', window.innerHeight);
