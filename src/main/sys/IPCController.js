@@ -39,8 +39,15 @@ export default class IPCController {
     /**
      * 暂停
      */
-    ipcMain.on(ipc.PAUSE, (event, uid) => {
-      download.pause(uid);
+    ipcMain.on(ipc.PAUSE, (event, uids) => {
+      download.pause(uids);
+    });
+
+    /**
+     * 删除下载
+     */
+    ipcMain.on(ipc.SYNC_REMOVE, (event, uids, removeFile) => {
+      event.returnValue = download.remove(uids, removeFile);
     });
   }
 }

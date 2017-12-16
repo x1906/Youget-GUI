@@ -1,6 +1,5 @@
 import forEach from 'lodash.foreach';
 import { spawn } from 'child_process';
-import uuid from 'node-uuid';
 import fs from 'fs';
 import kill from 'tree-kill';
 import { Buffer } from 'buffer';
@@ -17,13 +16,18 @@ export default class Download {
   constructor(config) {
     this.running = true; // 是否运行标志
     this.config = config;
-    this.records = this.read();
+    this.records = new Map();
+    const local = this.read();
+    debugger;
+    this.count = 0;
+    if (local) {
+      local.forEach((record) => {
+        this.count += 1; // 重新生成uid
+        this.records.set(this.count, record);
+      }, this);
+    }
     // 下载线程;
-    this.process = {};
-    this.json = {};
-    this.records.forEach((item) => {
-      this.json[item.uid] = item;
-    });
+    this.process = new Map();
   }
 
   FILE_NAME = 'download.json';
@@ -34,73 +38,79 @@ export default class Download {
    * @param {*} data
    */
   add(record) {
-    const uid = uuid.v1();
+    this.count += 1;
+    const uid = this.count;
     record.uid = uid;
-    this.json[uid] = record;
-    this.records.push(record);
+    this.records.set(uid, record);
     return uid;
   }
   /**
    * 更新下载记录
    * @param {*} data
-   * @param {String} uid
+   * @param {Number} uid
    */
   update(data, uid) {
-    const ret = this.json[uid];
-    if (data.status === status.DONE && ret.progress !== '100') {
-      ret.status = status.DONE;
-      ret.progress = '100';
-      const sizearr = ret.size.split('/');
-      const size = /[1-9]\d*\.\d*|0\.\d*[1-9]\d*/.exec(sizearr[1])[0];
-      ret.size = `${size}/${sizearr[1]}`;
+    if (this.records.has(uid)) {
+      const reocrd = this.records.get(uid);
+      if (data.status === status.EXIST) { // 下载已存在 清除
+        this.records.delete(uid);
+      } else {
+        forEach(data, (value, key) => {
+          reocrd[key] = value;
+        });
+      }
     }
-    forEach(data, (value, key) => {
-      ret[key] = value;
-    });
   }
   /**
    * 仅仅删除进程记录
-   * @param {String} uid 全局uid
+   * @param {Number} uid 全局uid
    */
-  removeOnlyProcess(uid) {
-    delete this.process[uid];
+  removeOnlyProcess(uid) { // 子进程异常退出时
+    this.process.delete(uid);
   }
   /**
    * 删除下载记录
-   * @param {String} uid 全局uid
+   * @param {Array<Number>} uids 全局uid
    * @param {Boolean} removeFile 是否删除文件
    */
-  remove(uid, removeFile) {
-    if (this.process[uid]) {
-      const childProcess = this.process[uid];
-      if (childProcess.pid) { // 删除下载记录 退出下载线程
-        kill(childProcess.pid);
+  remove(uids, removeFile) {
+    this.kill(uids);
+    uids.forEach((uid) => {
+      if (this.records.has(uid)) {
+        const record = this.records.get(uid);
+        const path = `${record.dir}\\${record.name}`;
+        if (removeFile) { // 删除文件
+          fs.unlinkSync(path);
+        }
+        this.records.delete(uid);
       }
-    }
-    // const ret = this.json[uid];
-    if (removeFile) { // 删除文件
-      // fs.unlinkSync()
-    }
-    delete this.json[uid];
-    let index = -1;
-    for (let i = 0, len = this.records.length; i < len; i += 1) {
-      if (this.records[i].uid === uid) {
-        index = i;
-        break;
-      }
-    }
-    if (index > -1) { // 删除数组内的数据
-      this.records = this.records.splice(index, 1);
-    }
+    }, this);
+    return true;
+  }
+
+  /**
+   * 暂停下载
+   * @param {Array<Number>} uids 全局id
+   */
+  pause(uids) {
+    uids.forEach((uid) => {
+      this.kill(uid);
+    });
   }
 
   /**
    * 保存
-   * @param {Array} records 下载记录
+   * @param {Map<Number,{}}>} records 下载记录
    */
   save(records) {
-    const json = JSON.stringify(records);
-    fs.writeFileSync(this.FILE_NAME, json, { encoding: 'utf-8' });
+    const data = [];
+    records.forEach((value) => {
+      data.push(value);
+    });
+    if (data.length > 0) { // 对数据进行排序
+      data.sort((a, b) => a.uid - b.uid);
+    }
+    fs.writeFileSync(this.FILE_NAME, JSON.stringify(data), { encoding: 'utf-8' });
   }
 
   read() {
@@ -112,7 +122,12 @@ export default class Download {
   }
 
   getRecords() {
-    return this.records;
+    const data = [];
+    this.records.forEach((value) => {
+      data.push(value);
+    });
+    return data.sort((a, b) => a.uid - b.uid);
+    // return this.records;
   }
   getConfig() {
     return this.config;
@@ -120,19 +135,19 @@ export default class Download {
 
   /**
    * 创建一个异步进程
-   * @param {String} uid 唯一ID
+   * @param {Number} uid 唯一ID
    * @param {Array} args 字符串参数列表
    * @param {Function} success 成功回调
    * @param {Function} error 失败回调
    * @param {Function} exit 退出回调
-   * @param {*} options # http://nodejs.cn/api/child_process.html#child_process_child_process_spawn_command_args_options
+   * @param {{}} options # http://nodejs.cn/api/child_process.html#child_process_child_process_spawn_command_args_options
    */
   createSpawn(uid, args, success, error, exit, options) {
     if (!options) options = {};
     options.encoding = options.encoding || this.config.encoding;
     const childProcess = spawn(this.config.execute, args, options);
     if (uid) { // 如有有 uid 才记录此线程
-      this.process[uid] = childProcess;
+      this.process.set(uid, childProcess);
     }
     childProcess.stdout.on('data', (data) => {
       if (Buffer.isBuffer(data)) {
@@ -147,38 +162,35 @@ export default class Download {
     });
 
     childProcess.on('exit', (code, signal) => {
-      console.log(`子进程退出码：${code} signal:${signal}`);
       if (exit && exit instanceof Function) { // 可以没有退出回调
         exit(code, signal);
       }
     });
   }
-
   /**
-   * 暂停下载
-   * @param {String} uid 全局id
+   * 杀死进程
+   * @param {Number} uid 全局uid
    */
-  pause(uid) {
-    if (this.process[uid]) {
-      const childProcess = this.process[uid];
+  kill(uid) {
+    if (this.process.has(uid)) {
+      const childProcess = this.process.get(uid);
       if (!childProcess.killed) {
         kill(childProcess.pid, 'SIGKILL');
-        delete this.process[uid];
+        this.process.delete(uid);
       }
     }
   }
-
   /**
    * 退出下载
    */
   exit() {
     this.running = false;
     if (this.process) {
-      forEach(this.process, (value) => {
+      this.process.forEach((value) => {
         if (value.pid) { // 杀死下载进程
           kill(value.pid, 'SIGKILL');
         }
-      });
+      }, this);
     }
     this.records.forEach((item) => { // 退出 将所有在下载的置暂停
       if (item.status === status.DOING) {
@@ -189,8 +201,8 @@ export default class Download {
   }
   /**
    * 成功返回, 如果有uid 会更新后台记录
-   * @param {*} data 返回数据
-   * @param {String} uid 记录uid
+   * @param {{}} data 返回数据
+   * @param {Number} uid 记录uid
    */
   ok(data, uid) {
     if (uid) this.update(data, uid);
@@ -201,16 +213,16 @@ export default class Download {
     };
   }
   /**
-  * 错误返回, 如果有uid 会更新后台记录
-  * @param {*} data 返回数据
-  * @param {String} uid 记录uid
+  * 错误返回
+  * @param {String} message 返回消息
+  * @param {Number} uid 记录uid
   */
-  err(data, uid) {
-    if (uid) this.update(data, uid);
+  err(message, uid) {
+    if (uid) this.update({ status: status.ERROR, message }, uid);
     return {
       uid,
       status: false,
-      data,
+      message,
     };
   }
 }

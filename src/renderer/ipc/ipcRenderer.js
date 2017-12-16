@@ -45,8 +45,8 @@ export function sendInfo(url) {
 /**
  * 新建下载
  * @param {String} url 下载地址
- * @param {*} options 下载配置项
- * @param {*} record 下载记录
+ * @param {{}} options 下载配置项
+ * @param {{}} record 下载记录
  */
 export function download(url, options, record) {
   return ipcRenderer.sendSync(ipc.SYNC_DOWNLOAD, url, options, record);
@@ -54,10 +54,19 @@ export function download(url, options, record) {
 
 /**
  * 暂停下载
- * @param {Array} uids 下载项目的uuid
+ * @param {Array<String>|String} uids 下载项目的uuid
  */
 export function pause(uids) {
   ipcRenderer.send(ipc.PAUSE, uids);
+}
+
+/**
+ * 删除下载
+ * @param {Array<String>|String} uids 下载项目的uuid
+ * @param {Boolean} removeFile 是否删除文件
+ */
+export function remove(uids, removeFile) {
+  return ipcRenderer.sendSync(ipc.SYNC_REMOVE, uids, removeFile);
 }
 
 /**
@@ -67,11 +76,3 @@ export function startup() {
   const data = ipcRenderer.sendSync(ipc.SYNC_STARTUP);
   return data;
 }
-
-// /**
-//  * 保存
-//  * @param {Array} history 下载记录
-//  */
-// export function saveHistory(history) {
-//   ipcRenderer.sendSync(ipc.SAVE_HISTORY, history);
-// }

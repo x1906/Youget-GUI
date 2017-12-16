@@ -18,3 +18,7 @@ export const DONE = 'Done';
  * 下载错误
  */
 export const ERROR = 'Error';
+/**
+ * 已存在
+ */
+export const EXIST = 'Exist';

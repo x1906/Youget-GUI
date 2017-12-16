@@ -68,11 +68,10 @@ export default {
 
     const $this = this;
     this.tableData = remote.startup();
-    if (this.tableData.length > 0) {
-      this.tableData.forEach((item) => {
-        $this.tableJson[item.uid] = item;
-      });
-    }
+    this.records = new Map();
+    this.tableData.forEach((value) => {
+      this.records.set(value.uid, value);
+    });
     // 启动监听新建单个下载
     // 监听新建下载事件
     bus.$on('open-single-dialog', () => {
@@ -84,6 +83,7 @@ export default {
     });
 
     bus.$on('remove-download', () => {
+      $this.removeDownload();
     });
 
     bus.$on('start-download', () => {
@@ -99,10 +99,10 @@ export default {
   data() {
     return {
       tableData: [],
-      tableJson: {},
+      records: new Map(),
       tableSelected: [],
       form: {
-        url: 'http://v.youku.com/v_show/id_XMzIwMzg4NTkzMg==.html',
+        url: '',
         info: {},
         downloadWith: '',
       },
@@ -130,8 +130,8 @@ export default {
       };
       const uid = remote.download(newStart.url, {}, newStart);
       newStart.uid = uid;
-      this.tableJson[uid] = newStart;
       this.tableData.push(newStart);
+      this.records.set(uid, newStart);
       this.clear();
     },
     startDownload() {
@@ -153,29 +153,49 @@ export default {
       });
       remote.pause(pause);
     },
+    removeDownload() {
+      const remove = [];
+      debugger;
+      this.tableSelected.forEach((item) => {
+        if (item.status !== status.START && item.status !== status.DOING) {
+          remove.push(item.uid);
+        }
+      });
+      if (remove.length > 0) {
+        const success = remote.remove(remove);
+        if (success) {
+          remove.forEach((uid) => {
+            this.records.delete(uid);
+          }, this);
+          const data = [];
+          this.records.forEach((value) => {
+            data.push(value);
+          }, this);
+          this.tableData = data.sort((a, b) => a.uid - b.uid);
+        }
+      }
+    },
     pauseBack(data) {
-      if (data.status && this.tableJson[data.uid]) {
-        const ret = this.tableJson[data.uid];
-        ret.status = data.data;
+      if (data.status && this.records.has(data.uid)) {
+        const record = this.records.get(data.uid);
+        record.status = data.data;
       }
     },
     downloadBack(data) {
       if (data.status) {
         const $this = this;
-        const ret = this.tableJson[data.uid];
-        if (ret) {
-          if (data.data.status === status.DONE && ret.progress !== '100') {
-            ret.status = status.DONE;
-            ret.progress = '100';
-            const sizearr = ret.size.split('/');
-            const size = /[1-9]\d*\.\d*|0\.\d*[1-9]\d*/.exec(sizearr[1])[0];
-            ret.size = `${size}/${sizearr[1]}`;
+        const record = this.records.get(data.uid);
+        if (record) {
+          if (data.data.status === status.EXIST) {
+            Message({ type: 'warning', message: data.data.message, showClose: true });
           } else {
             forEach(data.data, (value, key) => {
-              $this.$set(ret, key, value);
+              $this.$set(record, key, value);
             });
           }
         }
+      } else {
+        Message({ type: 'error', message: data.message, showClose: true });
       }
     },
     sendInfo() {

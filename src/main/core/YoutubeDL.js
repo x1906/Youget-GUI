@@ -14,9 +14,7 @@ export default class YoutubeDL extends Download {
 
   info(url) {
     super.createSpawn(null, ['-i', url], (data) => {
-      console.log(data);
     }, (data) => {
-      console.log(data);
     });
   }
 }

@@ -94,8 +94,8 @@ export default class Youget extends Download {
    *
    * 如果data 里没有uid 视为新下载 会重新生成uid 并添加到 super.records中
    * @param {String} url 视频地址
-   * @param {*} options 下载配置项 dir,downloadWith,force
-   * @param {*} record
+   * @param {{}} options 下载配置项 dir,downloadWith,force
+   * @param {{}} record 下载记录
    * @param {Function} callback 回调函数
    */
   download(url, options, record, callback) {
@@ -117,14 +117,18 @@ export default class Youget extends Download {
     args.push(url);
     super.createSpawn(uid, args,
       (data) => { // 成功 success
-        const result = $this.ok(Youget.handleDownload(data, options.dir), uid);
-        if ($this.running) {
-          callback(result);
+        const handleData = Youget.handleDownload(data, options.dir);
+        if (handleData) {
+          const result = $this.ok(handleData, uid);
+          if ($this.running) {
+            callback(result);
+          }
         }
       },
       (error) => { // 失败 error
         logger.info(error);
-        const result = $this.err({ status: status.ERROR, errorMessage: error.toString() });
+        // this.update({ status: status.ERROR }, uid);
+        const result = $this.err(error.toString());
         if ($this.running) {
           callback(result);
         }
@@ -145,7 +149,6 @@ export default class Youget extends Download {
         }
       },
     );
-
     return uid;
   }
 
@@ -211,8 +214,10 @@ export default class Youget extends Download {
         status: status.DONE,
       };
     } else if (/Skipping .*: file already exists/.test(data)) { // 文件已存在
+      const message = /Skipping .*:/.exec(data)[0];
       return {
-        status: status.DONE,
+        status: status.EXIST,
+        message: message.replace(/\s*Skipping\s*/),
       };
     }
     return null;
