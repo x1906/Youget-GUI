@@ -12,9 +12,9 @@ export default class YoutubeDL extends Download {
     this.type = 'youtube-dl';
   }
 
-  info(url) {
-    super.createSpawn(null, ['-i', url], (data) => {
-    }, (data) => {
-    });
-  }
+  // info(url) {
+  // super.createSpawn(null, ['-i', url], (data) => {
+  // }, (data) => {
+  // });
+  // }
 }
