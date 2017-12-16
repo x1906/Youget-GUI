@@ -1,27 +1,16 @@
-# youget-gui
+# Youget-GUI
 
-> Youget for Electron + Vue
-
-
-![screen001](https://github.com/leopoo/Youget-GUI/blob/master/screen001.png?raw=true)
-
-#### Build Setup
-
-``` bash
-# install dependencies
-npm install
-
-# serve with hot reload at localhost:9080
-npm run dev
-
-# build electron application for production
-npm run build
+>Desktop based on you-get and youtube-dl download tools, powered by electron
 
 
-# lint all JS/Vue component files in `src/`
-npm run lint
+# Screenshot
+![screen001](https://github.com/leopoo/Youget-GUI/blob/master/screen1.png?raw=true)
 
-```
+
+
+
+
+
 
 ---
 
