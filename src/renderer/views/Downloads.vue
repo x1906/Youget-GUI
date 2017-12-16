@@ -155,7 +155,6 @@ export default {
     },
     removeDownload() {
       const remove = [];
-      debugger;
       this.tableSelected.forEach((item) => {
         if (item.status !== status.START && item.status !== status.DOING) {
           remove.push(item.uid);

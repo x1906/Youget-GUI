@@ -18,7 +18,6 @@ export default class Download {
     this.config = config;
     this.records = new Map();
     const local = this.read();
-    debugger;
     this.count = 0;
     if (local) {
       local.forEach((record) => {
