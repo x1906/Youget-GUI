@@ -3,6 +3,9 @@
 >Desktop based on you-get and youtube-dl download tools, powered by electron
 
 
+![travis-ci](https://travis-ci.org/leopoo/Youget-GUI.svg?branch=master
+)
+
 # Screenshot
 ![screen001](https://github.com/leopoo/Youget-GUI/blob/master/screen1.png?raw=true)
 
