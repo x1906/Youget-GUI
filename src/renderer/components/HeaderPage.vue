@@ -19,7 +19,17 @@
     </ul>
     <ul class="f-right ">
       <li>
-        <i class="iconfont icon-menu "></i>
+        <el-dropdown trigger="click" style="color:#878d99; width:100%;">
+          <div style="cursor: pointer; width:100%; height:100%;">
+            <i class="iconfont icon-menu "></i>
+          </div>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item>设置</el-dropdown-item>
+            <el-dropdown-item :divided="true">检查更新</el-dropdown-item>
+            <el-dropdown-item>关于YougetGUI</el-dropdown-item>
+            <el-dropdown-item :divided="true">退出</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
       </li>
       <!-- <li>
         <i class="iconfont icon-sousuo "></i>
