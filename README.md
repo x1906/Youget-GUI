@@ -20,7 +20,7 @@ Youget-GUI是you-get和youtube-dl(还未实现)命令行下载工具的一个封
 1. 自定义下载目录
 1. youtube-dl下在功能
 1. 自动更新
-1.
+
 # Screenshot
 ![screen001](https://github.com/leopoo/Youget-GUI/blob/master/screen1.png?raw=true)
 
