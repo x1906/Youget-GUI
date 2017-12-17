@@ -120,19 +120,28 @@ export default {
     },
     newDownload() {
       // 确认新建下载
-      this.closeDialog();
-      this.dialog.lodaing = false;
-      const newStart = {
-        name: '名字被吃了.',
-        url: this.form.url,
-        downloadWith: this.form.downloadWith,
-        status: status.START,
-      };
-      const uid = remote.download(newStart.url, {}, newStart);
-      newStart.uid = uid;
-      this.tableData.push(newStart);
-      this.records.set(uid, newStart);
-      this.clear();
+      if (this.form.url) {
+        this.closeDialog();
+        this.dialog.lodaing = false;
+        const url = this.form.url || '';
+        const newStart = {
+          name: '名字被吃了.',
+          url: url.trim(),
+          downloadWith: this.form.downloadWith,
+          status: status.START,
+        };
+        const data = remote.download(newStart.url, {}, newStart);
+        if (data.status) {
+          this.clear();
+          newStart.uid = data.uid;
+          this.tableData.push(newStart);
+          this.records.set(data.uid, newStart);
+        } else {
+          Message({ type: 'waring', message: data.message, showClose: true });
+        }
+      } else {
+        Message({ type: 'waring', message: '请添加视频网址', showClose: true });
+      }
     },
     startDownload() {
       if (this.tableSelected.length > 0) {

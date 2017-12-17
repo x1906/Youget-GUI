@@ -17,12 +17,14 @@ export default class Download {
     this.running = true; // 是否运行标志
     this.config = config;
     this.records = new Map();
+    this.urls = {};
     const local = this.read();
     this.count = 0;
     if (local) {
       local.forEach((record) => {
         this.count += 1; // 重新生成uid
         this.records.set(this.count, record);
+        this.urls[record.url] = true;
       }, this);
     }
     // 下载线程;
@@ -36,12 +38,20 @@ export default class Download {
    * 添加下载记录
    * @param {*} data
    */
-  add(record) {
+  add(record, url) {
     this.count += 1;
     const uid = this.count;
+    this.urls[url] = true;
     record.uid = uid;
     this.records.set(uid, record);
     return uid;
+  }
+  /**
+   * 检查url 是否已经下在
+   * @param {String} url
+   */
+  check(url) {
+    return this.urls[url] !== undefined;
   }
   /**
    * 更新下载记录
@@ -81,6 +91,7 @@ export default class Download {
         if (removeFile) { // 删除文件
           fs.unlinkSync(path);
         }
+        delete this.urls[record.url];
         this.records.delete(uid);
       }
     }, this);

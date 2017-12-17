@@ -99,10 +99,13 @@ export default class Youget extends Download {
    * @param {Function} callback 回调函数
    */
   download(url, options, record, callback) {
+    if (super.check(url)) { // 如果下载存在
+      return super.err('此下载已存在下载列表中');
+    }
     const $this = this;
     const config = this.config;
     record.dir = record.dir || options.dir || config.videoDir;
-    const uid = record.uid || super.add(record); // 如果有uid 说明不是新增的
+    const uid = record.uid || super.add(record, url); // 如果有uid 说明不是新增的
     const dw = options.downloadWith || ''; // 下载指定类型
     const args = ['-o', record.dir, dw];
     // You may specify an HTTP proxy
@@ -149,7 +152,7 @@ export default class Youget extends Download {
         }
       },
     );
-    return uid;
+    return super.ok({ uid }, uid);
   }
 
   /**
