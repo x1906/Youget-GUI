@@ -24,7 +24,8 @@
   },
   "build": {
     "productName": "YougetGUI",
-    "appId": "com.leopoo.youget-gui",
+    "appId": "com.leopoo.${name}",
+    "copyright": "Copyright © 2017 ${author}",
     "directories": {
       "output": "build"
     },
@@ -53,6 +54,7 @@
       "icon": "build/icons/icon.ico"
     },
     "linux": {
+      "target": "tar.gz",
       "icon": "build/icons"
     }
   },
