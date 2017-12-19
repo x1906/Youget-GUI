@@ -6,7 +6,7 @@
 ![travis-ci](https://travis-ci.org/leopoo/Youget-GUI.svg?branch=master
 )
 ## 说明
-Youget-GUI是you-get和youtube-dl(还未实现)命令行下载工具的一个封装的一个桌面软件,目处于开发阶段,功能还没有完全完善,暂时只能下载
+Youget-GUI是you-get和youtube-dl(还未实现)命令行下载工具封装的一个桌面软件,目处于开发阶段,功能还没有完全完善,暂时只能下载
 
 [下载](https://github.com/leopoo/Youget-GUI/releases)
 
