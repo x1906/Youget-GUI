@@ -11,6 +11,8 @@ export default new Router({
     redirect: '/downlads',
     children: [{
       path: 'downlads', name: 'Downloads', component: require('@/views/Downloads').default,
+    }, {
+      path: 'settings', name: 'Settings', component: require('@/views/config/Settings').default,
     }],
   }, {
     path: '*', redirect: '/',

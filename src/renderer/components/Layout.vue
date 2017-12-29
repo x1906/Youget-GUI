@@ -3,18 +3,17 @@
     <el-header>
       <header-page></header-page>
     </el-header>
-    <el-main>
-      <main-page></main-page>
+    <el-main style="height:calc(100% - 60px);">
+      <router-view :key="$router.path"></router-view>
     </el-main>
   </el-container>
 </template>
 
 <script>
 import HeaderPage from './HeaderPage';
-import MainPage from './MainPage';
 
 export default {
-  components: { HeaderPage, MainPage },
+  components: { HeaderPage },
 };
 </script>
 <style>

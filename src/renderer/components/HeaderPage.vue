@@ -1,33 +1,40 @@
 <template>
   <div class="app-header ">
     <ul class="f-left">
-      <li class="active" @click="newDownloads" title="新建下载">
-        <i class="iconfont icon-jia"></i>
-      </li>
-      <li title="开始下载" v-bind:class="{ active: header.start }" @click="startDownload">
-        <i class=" iconfont icon-kaishi"></i>
-      </li>
-      <li title="暂停下载" v-bind:class="{ active: header.pause }" @click="pauseDownload">
-        <i class="iconfont icon-zanting"></i>
-      </li>
-      <li title="删除下载" v-bind:class="{ active: header.remove }" @click="removeDownload">
-        <i class="iconfont icon-shanchu"></i>
-      </li>
+      <template v-if="!config.open">
+        <li class="active" @click="newDownloads" title="新建下载">
+          <i class="iconfont icon-jia"></i>
+        </li>
+        <li title="开始下载" v-bind:class="{ active: header.start }" @click="startDownload">
+          <i class=" iconfont icon-kaishi"></i>
+        </li>
+        <li title="暂停下载" v-bind:class="{ active: header.pause }" @click="pauseDownload">
+          <i class="iconfont icon-zanting"></i>
+        </li>
+        <li title="删除下载" v-bind:class="{ active: header.remove }" @click="removeDownload">
+          <i class="iconfont icon-shanchu"></i>
+        </li>
+      </template>
+      <template v-else>
+        <li title="返回" @click="returnDownload">
+          <i class="iconfont icon-fanhui"></i>
+        </li>
+      </template>
       <!-- <li>
         <i class="iconfont icon-yidong "></i>
       </li> -->
     </ul>
     <ul class="f-right ">
       <li>
-        <el-dropdown trigger="click" style="color:#878d99; width:100%;">
+        <el-dropdown trigger="click" style="color:#878d99; width:100%;" @command="handleCommand" :show-timeout="50" :hide-timeout="50">
           <div style="cursor: pointer; width:100%; height:100%;">
             <i class="iconfont icon-menu "></i>
           </div>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item>设置</el-dropdown-item>
-            <el-dropdown-item :divided="true">检查更新</el-dropdown-item>
-            <el-dropdown-item>关于YougetGUI</el-dropdown-item>
-            <el-dropdown-item :divided="true">退出</el-dropdown-item>
+            <el-dropdown-item :disabled="config.open" command="config">设置</el-dropdown-item>
+            <el-dropdown-item :divided="true" command="checkupdate">检查更新</el-dropdown-item>
+            <el-dropdown-item command="about">关于YougetGUI</el-dropdown-item>
+            <el-dropdown-item :divided="true" command="exit">退出</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </li>
@@ -42,7 +49,30 @@
 import { mapGetters } from 'vuex';
 import bus from './EventBus';
 export default {
+  data() {
+    return {
+      config: {
+        open: false,
+      },
+    };
+  },
+  mounted() {
+    this.config.open = this.$route.name !== 'Downloads';
+  },
   methods: {
+    returnDownload() {
+      this.$router.push('Downloads');
+      this.config.open = false;
+    },
+    handleCommand(command) {
+      switch (command) {
+        case 'config':
+          this.$router.push('Settings');
+          break;
+        default:
+      }
+      this.config.open = true;
+    },
     newDownloads() {
       // 打开单个下载窗口
       bus.$emit('open-single-dialog');
