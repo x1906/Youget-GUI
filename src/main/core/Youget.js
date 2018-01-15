@@ -104,7 +104,7 @@ export default class Youget extends Download {
     }
     const $this = this;
     const config = this.config;
-    record.dir = record.dir || options.dir || config.videoDir;
+    record.dir = record.dir || options.dir || config.common.dir;
     const uid = record.uid || super.add(record, url); // 如果有uid 说明不是新增的
     const dw = options.downloadWith || ''; // 下载指定类型
     const args = ['-o', record.dir, dw];

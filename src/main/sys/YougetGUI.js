@@ -1,7 +1,8 @@
 import fs from 'fs';
 import { app } from 'electron';
 import Youget from '../core/Youget';
-import IPCController from './IPCController';
+import DownloadController from '../controller/DownloadController';
+import SettingsController from '../controller/SettingsController';
 import logger from './Logger';
 
 /**
@@ -13,11 +14,14 @@ export default class YougetGUI {
     this.config = {
       execute: 'you-get',
       encoding: 'UTF-8',
-      videoDir: app.getPath('downloads'),
+      common: {
+        dir: app.getPath('downloads'),
+      },
       proxy: '',
     };
     this.download = new Youget(this.config);
-    this.ipc = new IPCController(this.download);
+    this.ipc = new DownloadController(this.download);
+    this.settingController = new SettingsController(this);
 
     process.on('uncaughtException', (err) => { // 监听未捕获的异常
       logger.error(err);
@@ -27,6 +31,10 @@ export default class YougetGUI {
   saveConfig(config) {
     const json = JSON.stringify(config);
     fs.writeFileSync(this.CONFIG_FILE_NAME, json, { encoding: 'utf-8' });
+  }
+
+  getConfig() {
+    return this.config;
   }
 
   exit() {

@@ -19,3 +19,5 @@ export const DOWNLOAD_REPLY = 'download-reply';
  */
 export const SYNC_REMOVE = 'sync-remove';
 
+
+export const GET_CONFIG = 'sys-get-config';

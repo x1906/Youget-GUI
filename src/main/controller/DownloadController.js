@@ -2,7 +2,7 @@
 import { ipcMain } from 'electron';
 import * as ipc from '../../utils/ipc-types';
 
-export default class IPCController {
+export default class DownloadController {
   /**
    * 初始化ipc 控制器
    * @param {Youget|Youtubedl} download 下载器

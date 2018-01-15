@@ -1,6 +1,6 @@
 <template>
   <el-container class="settings">
-    <el-aside width="220px">
+    <el-aside width="200px">
       <p>设置</p>
       <ul>
         <li :class="{active : active===1}" @click="go(1)">通用</li>
@@ -10,21 +10,26 @@
         <li :class="{active : active===5}" @click="go(5)">高级</li>
       </ul>
     </el-aside>
-    <el-main>
+    <el-main class="settings-main">
       <div>
-        <p style="border-buttom:1px solid #eaeefb;">通用</p>
+        <p>通用</p>
+        <el-form label-position="top" size="mini">
+          <el-form-item label="下载目录">
+            <el-input v-model="config.common.dir" placeholder="请输入内容"></el-input>
+          </el-form-item>
+        </el-form>
       </div>
       <div>
-        <p style="border-buttom:1px solid #eaeefb;">YOU-GET</p>
+        <p>YOU-GET</p>
       </div>
       <div>
-        <p style="border-buttom:1px solid #eaeefb;">YOUTUBE-DL</p>
+        <p>YOUTUBE-DL</p>
       </div>
       <div>
-        <p style="border-buttom:1px solid #eaeefb;">网络</p>
+        <p>网络</p>
       </div>
       <div>
-        <p style="border-buttom:1px solid #eaeefb;">高级</p>
+        <p>高级</p>
       </div>
     </el-main>
   </el-container>
@@ -34,6 +39,11 @@
 export default {
   data() {
     return {
+      config: {
+        common: {
+          dir: '',
+        },
+      },
       active: 1,
     };
   },
@@ -48,28 +58,37 @@ export default {
 <style scoped>
 .settings {
   width: 100%;
+  cursor: default;
 }
 .settings p {
   font-size: 25px;
   padding: 10px 20px;
   margin: 0px;
 }
-.settings div > p {
-  border-bottom: 1px solid #eaeefb;
-  padding: 10px 0px;
-}
 
 .settings ul {
   padding: 0px;
   margin: 0px;
 }
-.settings ul li {
+.settings .el-aside ul li {
   cursor: pointer;
   padding: 5px 0px 5px 28px;
 }
 .settings .active {
   border-left: 5px solid #50bfff;
   padding-left: 23px;
+}
+.settings .settings-main {
+  position: fixed;
+  margin-left: 220px;
+  width: calc(100% - 200px);
+  height: calc(100% - 20px);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.settings-main div > p {
+  border-bottom: 1px solid #eaeefb;
+  padding: 10px 0px;
 }
 </style>
 

@@ -3,7 +3,7 @@
     <el-header>
       <header-page></header-page>
     </el-header>
-    <el-main style="height:calc(100% - 60px);">
+    <el-main class="main">
       <router-view :key="$router.path"></router-view>
     </el-main>
   </el-container>
@@ -20,6 +20,12 @@ export default {
 .el-header,
 .el-main {
   padding: 0px;
+}
+.main {
+  width: 100%;
+  height: calc(100% - 80px);
+  position: fixed;
+  margin-top: 60px;
 }
 .f-left {
   float: left;
